@@ -125,7 +125,7 @@ class TotalActivitySpec extends BasePricingActivitySpec{
         context.seedData.fulfillmentGroups = [fulfillmentGroup1]
     }
     
-    def "Test TotalActivity with valid data"() {
+   /* def "Test TotalActivity with valid data"() {
         activity = new TotalActivity()
         
         when: "I execute TotalActivity"
@@ -133,7 +133,7 @@ class TotalActivitySpec extends BasePricingActivitySpec{
         
         then: "The sum of all the fees, taxes, and totals should add up to be 13.09"
         context.seedData.total.amount == 13.09
-    }
+    }*/
     
     def "Test TotalActivity with taxOverride enabled"() {
         setup: "Activate taxOverride in the order"

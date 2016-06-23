@@ -80,14 +80,21 @@ public class ToggleFacetLinkProcessor extends AbstractAttributeModifierAttrProce
         String value = facetService.getValue(result);
         String[] paramValues = params.get(key);
         
-        if (ArrayUtils.contains(paramValues, facetService.getValue(result))) {
-            paramValues = (String[]) ArrayUtils.removeElement(paramValues, facetService.getValue(result));
+        if (result.isActive()) {
+            paramValues = (String[]) ArrayUtils.removeElement(paramValues, value);
         } else {
-            paramValues = (String[]) ArrayUtils.add(paramValues, value);
+        	paramValues = new String[] {value}; //(String[]) ArrayUtils.add(paramValues, value);
         }
         
         params.remove(SearchCriteria.PAGE_NUMBER);
-        params.put(key, paramValues);
+        //params.put(key, paramValues);
+        params.remove(key);
+        params.put("facetField", new String[] {key});    
+        if (paramValues != null) {
+        	for (String paramValue : paramValues) {
+        		params.put(key + "-" + paramValue, new String[]{"on"});
+        	}
+        }
         
         String url = ProcessorUtils.getUrl(baseUrl, params);
         

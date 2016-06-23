@@ -314,7 +314,7 @@ public class AdminProductController extends AdminBasicEntityController {
             form.removeListGrid("productOptions");
         }
         
-        form.removeListGrid("defaultSku.skuAttributes");
+        //form.removeListGrid("defaultSku.skuAttributes");
         
         return view;
     }

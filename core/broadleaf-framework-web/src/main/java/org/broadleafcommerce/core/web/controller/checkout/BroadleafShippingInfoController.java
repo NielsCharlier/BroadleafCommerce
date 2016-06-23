@@ -163,8 +163,9 @@ public class BroadleafShippingInfoController extends AbstractCheckoutController 
     protected void copyBillingAddressToShippingAddress(Order order, ShippingInfoForm shippingInfoForm) {
         if (order.getPayments() != null) {
             for (OrderPayment payment : order.getPayments()) {
-                if (payment.isActive() && PaymentType.CREDIT_CARD.equals(payment.getType())) {
-                    Address billing = payment.getBillingAddress();
+                if (payment.isActive() && payment.getBillingAddress() != null) {
+                	shippingInfoForm.setAddress(payment.getBillingAddress());
+                    /*Address billing = payment.getBillingAddress();
                     if (billing != null) {
                         Address shipping = addressService.create();
                         shipping.setFullName(billing.getFullName());
@@ -187,7 +188,7 @@ public class BroadleafShippingInfoController extends AbstractCheckoutController 
                         shipping.setPhoneFax(copyPhone(billing.getPhoneFax()));
                         shipping.setEmailAddress(billing.getEmailAddress());
                         shippingInfoForm.setAddress(shipping);
-                    }
+                    }*/
                 }
             }
 

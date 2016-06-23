@@ -500,4 +500,6 @@ public interface OrderItem extends Serializable, Cloneable {
      */
     public boolean isAParentOf(OrderItem candidateChild);
 
+	boolean appliesToOrderOffer();
+
 }

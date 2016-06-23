@@ -45,6 +45,7 @@ public class ShippingInfoForm implements Serializable {
     protected PersonalMessage personalMessage = new PersonalMessageImpl();
     protected String deliveryMessage;
     protected boolean useBillingAddress;
+    protected boolean dirty;
 
     public ShippingInfoForm() {
         address.setPhonePrimary(new PhoneImpl());
@@ -107,4 +108,12 @@ public class ShippingInfoForm implements Serializable {
     public void setUseBillingAddress(boolean useBillingAddress) {
         this.useBillingAddress = useBillingAddress;
     }
+
+	public boolean isDirty() {
+		return dirty;
+	}
+
+	public void setDirty(boolean dirty) {
+		this.dirty = dirty;
+	}
 }

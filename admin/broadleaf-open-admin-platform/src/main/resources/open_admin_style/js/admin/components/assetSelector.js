@@ -57,8 +57,9 @@
             $redactor.on('assetInfoSelected', function(event, fields) {
                 currentRedactor.selection.restore();
                 var assetUrl =   fields['assetUrl'];
+                var altText =   fields['altText'];
                 if (assetUrl.charAt(0) == "/") assetUrl = assetUrl.substr(1);
-                var $img = $('<img>', { 'src' : assetUrl });
+                var $img = $('<img>', { 'src' : assetUrl, 'alt' : altText });
                 currentRedactor.insert.html($img.outerHTML());
                 BLCAdmin.hideCurrentModal();
             });
@@ -115,6 +116,7 @@ $(document).ready(function() {
     $('body').on('listGrid-asset-rowSelected', function(event, link, fields, currentUrl) {
         var json = {
             'assetUrl' : fields['cmsUrlPrefix'] + fields['fullUrl'],
+            'altText' : fields['altText'],
             'adminDisplayAssetUrl' : fields['servletContext'] + fields['cmsUrlPrefix'] + fields['fullUrl']
         }
         

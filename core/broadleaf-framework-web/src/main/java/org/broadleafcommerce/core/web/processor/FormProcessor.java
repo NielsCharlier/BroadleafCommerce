@@ -22,7 +22,12 @@ package org.broadleafcommerce.core.web.processor;
 import org.broadleafcommerce.common.exception.ServiceException;
 import org.broadleafcommerce.common.security.handler.CsrfFilter;
 import org.broadleafcommerce.common.security.service.ExploitProtectionService;
+import org.broadleafcommerce.common.util.BLCRequestUtils;
+import org.broadleafcommerce.profile.web.core.CustomerState;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.thymeleaf.Arguments;
 import org.thymeleaf.dom.Element;
 import org.thymeleaf.processor.ProcessorResult;
@@ -31,6 +36,8 @@ import org.thymeleaf.standard.expression.Expression;
 import org.thymeleaf.standard.expression.StandardExpressions;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * Used as a replacement to the HTML {@code <form>} element which adds a CSRF token input field to forms that are submitted
@@ -83,7 +90,21 @@ public class FormProcessor extends AbstractElementProcessor {
                     csrfNode.setAttribute("name", eps.getCsrfTokenParameter());
                     csrfNode.setAttribute("value", csrfToken);
                     element.addChild(csrfNode);
+                }                
+                
+                if (CustomerState.getCustomer() != null) {
+	                Element customerIsLoggedIn = new Element("input");
+	                customerIsLoggedIn.setAttribute("type", "hidden");
+	                customerIsLoggedIn.setAttribute("name", "customerIsLoggedIn");
+	                customerIsLoggedIn.setAttribute("value", Boolean.toString(CustomerState.getCustomer().isLoggedIn()));
+		            element.addChild(customerIsLoggedIn);
                 }
+		        Element origin = new Element("input");
+	            origin.setAttribute("type", "hidden");
+	            origin.setAttribute("name", "locationOfOrigin");
+	            origin.setAttribute("value", 
+	            		((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getRequestURI());
+	            element.addChild(origin);
 
             } catch (ServiceException e) {
                 throw new RuntimeException("Could not get a CSRF token for this session", e);

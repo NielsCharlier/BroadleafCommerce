@@ -76,6 +76,7 @@ public class RemoveFacetValuesLinkProcessor extends AbstractAttributeModifierAtt
         SearchFacetDTO facet = (SearchFacetDTO) expression.execute(arguments.getConfiguration(), arguments);
         
         String key = searchFacetDTOService.getUrlKey(facet);
+        params.put("facetField", new String[] {key});
         params.remove(key);
         params.remove(SearchCriteria.PAGE_NUMBER);
         

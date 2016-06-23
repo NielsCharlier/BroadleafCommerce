@@ -843,4 +843,7 @@ public class OrderImpl implements Order, AdminMainEntity, CurrencyCodeIdentifiab
             public static final int OFFERCODES = 2000;
         }
     }
+
+	@Override
+	public void getReadyForFilter() {}
 }

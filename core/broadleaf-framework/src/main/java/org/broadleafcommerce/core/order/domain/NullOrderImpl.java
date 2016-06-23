@@ -386,4 +386,7 @@ public class NullOrderImpl implements Order {
     public <G extends Order> CreateResponse<G> createOrRetrieveCopyInstance(MultiTenantCopyContext context) throws CloneNotSupportedException {
         return null;
     }
+
+	@Override
+	public void getReadyForFilter() {}
 }

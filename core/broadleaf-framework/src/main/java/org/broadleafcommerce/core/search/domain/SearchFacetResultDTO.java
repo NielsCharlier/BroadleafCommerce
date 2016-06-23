@@ -20,6 +20,7 @@
 package org.broadleafcommerce.core.search.domain;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author Andre Azzolini (apazzolini)
@@ -93,6 +94,14 @@ public class SearchFacetResultDTO {
         }
         
         return value;
+    }
+    
+    public List<SearchFacetResultDTO> getChildren() {
+		return null;
+	}
+    
+    public boolean isPartlyActive() {
+        return active;
     }
     
 }

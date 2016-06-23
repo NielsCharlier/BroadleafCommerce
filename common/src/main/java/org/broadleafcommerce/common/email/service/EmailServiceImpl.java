@@ -33,6 +33,8 @@ import org.broadleafcommerce.common.email.service.info.ServerInfo;
 import org.broadleafcommerce.common.email.service.message.EmailPropertyType;
 import org.broadleafcommerce.common.email.service.message.EmailServiceProducer;
 import org.broadleafcommerce.common.email.service.message.MessageCreator;
+import org.broadleafcommerce.common.util.BroadleafMergeResourceBundleMessageSource;
+import org.broadleafcommerce.common.web.BroadleafRequestContext;
 import org.springframework.stereotype.Service;
 
 /**
@@ -54,6 +56,9 @@ public class EmailServiceImpl implements EmailService {
 
     @Resource(name = "blEmailReportingDao")
     protected EmailReportingDao emailReportingDao;
+    
+    @Resource(name = "messageSource")
+    BroadleafMergeResourceBundleMessageSource messageSource;
 
     public boolean sendTemplateEmail(EmailTarget emailTarget, EmailInfo emailInfo, Map<String, Object> props) {
         if (props == null) {
@@ -88,6 +93,9 @@ public class EmailServiceImpl implements EmailService {
         if (emailInfo == null) {
             emailInfo = new EmailInfo();
         }
+        
+        emailInfo.setSubject(messageSource.getMessage(emailInfo.getSubject(), null, emailInfo.getSubject(), 
+        		BroadleafRequestContext.getBroadleafRequestContext().getJavaLocale()));       
 
         props.put(EmailPropertyType.INFO.getType(), emailInfo);
         props.put(EmailPropertyType.USER.getType(), emailTarget);

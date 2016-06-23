@@ -24,6 +24,7 @@ import org.broadleafcommerce.core.catalog.domain.Product;
 import org.broadleafcommerce.core.catalog.domain.ProductOption;
 import org.broadleafcommerce.core.catalog.domain.ProductOptionValue;
 import org.broadleafcommerce.core.catalog.domain.Sku;
+import org.broadleafcommerce.core.catalog.domain.SkuProductOptionValueXref;
 import org.broadleafcommerce.core.catalog.service.CatalogService;
 import org.broadleafcommerce.core.catalog.service.type.ProductOptionValidationStrategyType;
 import org.broadleafcommerce.core.order.domain.OrderItem;
@@ -155,6 +156,10 @@ public class ValidateAddRequestActivity extends BaseActivity<ProcessContext<Cart
         if (sku == null && skuId != null) {
             sku = catalogService.findSkuById(skuId);
         }
+        
+        if (useSku) {
+        	checkSkuForMatch(sku, product, attributeValues, messages);
+        }
 
         if (sku == null && product != null) {
             // Set to the default sku
@@ -166,11 +171,10 @@ public class ValidateAddRequestActivity extends BaseActivity<ProcessContext<Cart
         return sku;
     }
     
-    protected Sku findMatchingSku(Product product, Map<String, String> attributeValues, ActivityMessages messages) {
-        Map<String, String> attributeValuesForSku = new HashMap<String,String>();
-        // Verify that required product-option values were set.
-
-        if (product != null && product.getProductOptions() != null && product.getProductOptions().size() > 0) {
+    protected Map<String, String> getAttributeValuesForSku(Product product, Map<String, String> attributeValues, ActivityMessages messages) {
+    	Map<String, String> attributeValuesForSku = new HashMap<String,String>();
+    	
+    	if (product != null && product.getProductOptions() != null && product.getProductOptions().size() > 0) {
             for (ProductOption productOption : product.getProductOptions()) {
                 if (productOption.getRequired() && (productOption.getProductOptionValidationStrategyType() == null ||
                         productOption.getProductOptionValidationStrategyType().getRank() <= ProductOptionValidationStrategyType.ADD_ITEM.getRank())) {
@@ -198,24 +202,43 @@ public class ValidateAddRequestActivity extends BaseActivity<ProcessContext<Cart
                     
                 }
             }
-            
+    	}
+    	
+    	return attributeValuesForSku;
+    }
+    
+    protected Sku findMatchingSku(Product product, Map<String, String> attributeValues, ActivityMessages messages) {
+        Map<String, String> attributeValuesForSku = getAttributeValuesForSku(product, attributeValues, messages);
+        // Verify that required product-option values were set.
 
-            if (product !=null && product.getSkus() != null) {
-                for (Sku sku : product.getSkus()) {
-                   if (checkSkuForMatch(sku, attributeValuesForSku)) {
-                       return sku;
-                   }
-                }
-            }
-        }
+		if (product != null && product.getSkus() != null) {
+			for (Sku sku : product.getSkus()) {
+				if (checkSkuForMatch(sku, attributeValuesForSku)) {
+					return sku;
+				}
+			}
+		}
 
         return null;
     }
+    
+    protected void checkSkuForMatch(Sku sku, Product product, Map<String, String> attributeValues, ActivityMessages messages) {
+    	for (SkuProductOptionValueXref productOptionValue : sku.getProductOptionValueXrefs()) {
+    		String attName = productOptionValue.getProductOptionValue().getProductOption().getAttributeName();
+    		if (attributeValues.get(attName) == null) {
+    			attributeValues.put(attName, productOptionValue.getProductOptionValue().getAttributeValue());
+    		}
+    	}
+    	
+		if (!checkSkuForMatch(sku, getAttributeValuesForSku(product, attributeValues, messages))) {
+			throw new IllegalArgumentException("options do not match with sku.");
+		}
+    }
 
     protected boolean checkSkuForMatch(Sku sku, Map<String,String> attributeValues) {
-        if (attributeValues == null || attributeValues.size() == 0) {
+        /*if (attributeValues == null || attributeValues.size() == 0) {
             return false;
-        }
+        }*/
 
         for (String attributeName : attributeValues.keySet()) {
             boolean optionValueMatchFound = false;

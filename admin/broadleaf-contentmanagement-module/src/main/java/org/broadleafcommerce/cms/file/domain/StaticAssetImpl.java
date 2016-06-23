@@ -116,7 +116,8 @@ public class StaticAssetImpl implements StaticAsset, AdminMainEntity {
     @Column(name = "ALT_TEXT", nullable = true)
     @AdminPresentation(friendlyName = "StaticAssetImpl_Alt_Text",
             order = Presentation.FieldOrder.ALT_TEXT,
-            translatable = true)
+            translatable = true,
+            prominent = true)
     protected String altText;
 
     @Column(name = "MIME_TYPE")

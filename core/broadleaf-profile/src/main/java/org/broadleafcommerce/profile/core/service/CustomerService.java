@@ -27,7 +27,9 @@ import org.broadleafcommerce.profile.core.service.handler.PasswordUpdatedHandler
 import org.broadleafcommerce.profile.core.service.listener.PostRegistrationObserver;
 import org.springframework.security.authentication.dao.SaltSource;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface CustomerService {
 
@@ -36,6 +38,8 @@ public interface CustomerService {
     public Customer saveCustomer(Customer customer, boolean register);
 
     public Customer registerCustomer(Customer customer, String password, String passwordConfirm);
+    
+    public Customer registerCustomer(Customer customer, String password, String passwordConfirm, Map<String, Object> vars);
 
     public Customer readCustomerByUsername(String customerName);
 

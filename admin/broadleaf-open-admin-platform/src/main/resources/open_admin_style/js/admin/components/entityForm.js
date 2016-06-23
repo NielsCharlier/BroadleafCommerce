@@ -61,6 +61,20 @@ $(document).ready(function() {
         
         event.preventDefault();
     });
+    
+    $('body').on('click', 'button.custom-button', function(event) {
+        var $form = BLCAdmin.getForm($(this));
+        var currentAction = $form.attr('action');
+        var customUrl = currentAction + $(this).attr("data-action");        
+        window.location.href = customUrl;
+    });
+    
+    $('body').on('click', 'button.custom-button-new', function(event) {
+        var $form = BLCAdmin.getForm($(this));
+        var currentAction = $form.attr('action');
+        var customUrl = currentAction + $(this).attr("data-action");        
+        window.open(customUrl);
+    });
 
     $('body').on('click', 'button.submit-button', function(event) {
         $('body').click(); // Defocus any current elements in case they need to act prior to form submission

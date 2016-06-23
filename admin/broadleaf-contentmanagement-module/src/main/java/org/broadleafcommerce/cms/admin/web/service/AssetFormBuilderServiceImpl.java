@@ -52,7 +52,7 @@ public class AssetFormBuilderServiceImpl implements AssetFormBuilderService {
             .withFriendlyName("Asset_thumbnail")
             .withFieldType(SupportedFieldType.STRING.toString())
             .withOrder(Integer.MIN_VALUE)
-            .withColumnWidth("50px")
+            .withColumnWidth("200px")
             .withFilterSortDisabled(true));
         
         for (ListGridRecord record : listGrid.getRecords()) {

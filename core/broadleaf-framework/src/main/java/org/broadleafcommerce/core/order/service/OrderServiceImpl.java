@@ -20,6 +20,7 @@
 package org.broadleafcommerce.core.order.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ import org.broadleafcommerce.common.util.TransactionUtils;
 import org.broadleafcommerce.common.web.BroadleafRequestContext;
 import org.broadleafcommerce.core.catalog.domain.Product;
 import org.broadleafcommerce.core.catalog.domain.Sku;
+import org.broadleafcommerce.core.catalog.domain.SkuProductOptionValueXref;
 import org.broadleafcommerce.core.offer.dao.OfferDao;
 import org.broadleafcommerce.core.offer.domain.Offer;
 import org.broadleafcommerce.core.offer.domain.OfferCode;
@@ -800,7 +802,11 @@ public class OrderServiceImpl implements OrderService {
         // Must match on SKU and options
         if (item1Sku != null && item2.getSkuId() != null) {
             if (item1Sku.getId().equals(item2.getSkuId())) {
-                return true;
+            	item1Attributes = new HashMap<String, OrderItemAttribute>(item1Attributes);
+            	for (SkuProductOptionValueXref po : item1Sku.getProductOptionValueXrefs()) {
+            		item1Attributes.remove(po.getProductOptionValue().getProductOption().getAttributeName());
+            	}
+            	return compareAttributes(item1Attributes, item2);
             }
         } else {
             if (item1Product != null && item2.getProductId() != null) {

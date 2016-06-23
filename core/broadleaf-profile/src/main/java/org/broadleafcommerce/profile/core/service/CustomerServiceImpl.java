@@ -58,6 +58,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -191,10 +192,15 @@ public class CustomerServiceImpl implements CustomerService {
     protected String generateSecurePassword() {
         return RandomStringUtils.randomAlphanumeric(16);
     }
+    
+    @Override
+    public Customer registerCustomer(Customer customer, String password, String passwordConfirm) {
+    	return registerCustomer(customer, password, passwordConfirm, null);
+    }
 
     @Override
     @Transactional(TransactionUtils.DEFAULT_TRANSACTION_MANAGER)
-    public Customer registerCustomer(Customer customer, String password, String passwordConfirm) {
+    public Customer registerCustomer(Customer customer, String password, String passwordConfirm, Map<String, Object> additionalVars) {
         customer.setRegistered(true);
 
         // When unencodedPassword is set the save() will encode it
@@ -207,6 +213,9 @@ public class CustomerServiceImpl implements CustomerService {
         
         HashMap<String, Object> vars = new HashMap<String, Object>();
         vars.put("customer", retCustomer);
+        if (additionalVars != null) {
+        	vars.putAll(additionalVars);
+        }
         
         emailService.sendTemplateEmail(customer.getEmailAddress(), getRegistrationEmailInfo(), vars);        
         notifyPostRegisterListeners(retCustomer);

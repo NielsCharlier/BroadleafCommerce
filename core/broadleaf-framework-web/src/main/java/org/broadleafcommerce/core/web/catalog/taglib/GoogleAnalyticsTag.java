@@ -110,7 +110,7 @@ public class GoogleAnalyticsTag extends SimpleTagSupport {
         if (order != null) {
             Address paymentAddress = null;
             for (OrderPayment payment : order.getPayments())  {
-                if (payment.isActive() && PaymentType.CREDIT_CARD.equals(payment.getType())) {
+                if (payment.isActive() && payment.getBillingAddress() != null) {
                     paymentAddress = payment.getBillingAddress();
                 }
             }

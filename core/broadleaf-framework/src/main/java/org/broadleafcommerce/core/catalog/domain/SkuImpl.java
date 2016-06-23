@@ -312,7 +312,7 @@ public class SkuImpl implements Sku {
         toOneParentProperty = "sku",
         forceFreeFormKeys = true
     )
-    @AdminPresentationMapFields(
+    /*@AdminPresentationMapFields(
         mapDisplayFields = {
             @AdminPresentationMapField(
                     fieldName = "primary",
@@ -322,7 +322,7 @@ public class SkuImpl implements Sku {
                             order = ProductImpl.Presentation.FieldOrder.PRIMARY_MEDIA,
                             friendlyName = "SkuImpl_Primary_Media")
             )
-    })
+    })*/
     protected Map<String, SkuMediaXref> skuMedia = new HashMap<String, SkuMediaXref>();
 
     @Transient

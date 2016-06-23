@@ -398,6 +398,7 @@ public class ItemOfferProcessorImpl extends OrderOfferProcessorImpl implements I
     public void filterOffers(PromotableOrder order, List<Offer> filteredOffers, List<PromotableCandidateOrderOffer> qualifiedOrderOffers, List<PromotableCandidateItemOffer> qualifiedItemOffers) {
         // set order subTotal price to total item price without adjustments
         order.setOrderSubTotalToPriceWithoutAdjustments();
+        order.getReadyForFilter();
 
         for (Offer offer : filteredOffers) {            
             if(offer.getType().equals(OfferType.ORDER)){

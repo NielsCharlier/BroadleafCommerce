@@ -507,9 +507,9 @@ public class SolrIndexServiceImpl implements SolrIndexService {
                     continue;
                 }
                 
-                if (sku.getDefaultProduct() instanceof ProductBundle) {
+                /*if (sku.getDefaultProduct() instanceof ProductBundle) {
                     continue;
-                }
+                }*/
 
                 skusToIndex.add(sku);
             }

@@ -36,7 +36,9 @@ public class BillingInfoForm implements Serializable {
     private static final long serialVersionUID = 1L;
 
     protected Address address = new AddressImpl();
+    protected String addressName;
     protected boolean useShippingAddress;
+    protected boolean dirty;
 
     public BillingInfoForm() {
         address.setPhonePrimary(new PhoneImpl());
@@ -59,4 +61,20 @@ public class BillingInfoForm implements Serializable {
     public void setUseShippingAddress(boolean useShippingAddress) {
         this.useShippingAddress = useShippingAddress;
     }
+
+	public boolean isDirty() {
+		return dirty;
+	}
+
+	public void setDirty(boolean dirty) {
+		this.dirty = dirty;
+	}
+
+	public String getAddressName() {
+		return addressName;
+	}
+
+	public void setAddressName(String addressName) {
+		this.addressName = addressName;
+	}
 }

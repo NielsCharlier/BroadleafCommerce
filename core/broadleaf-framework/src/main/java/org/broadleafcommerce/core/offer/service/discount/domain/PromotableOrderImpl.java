@@ -75,6 +75,11 @@ public class PromotableOrderImpl implements PromotableOrder {
             }
         }
     }
+    
+    @Override 
+    public void getReadyForFilter() {
+    	order.getReadyForFilter();
+    }
 
     @Override
     public void setOrderSubTotalToPriceWithoutAdjustments() {
@@ -339,4 +344,15 @@ public class PromotableOrderImpl implements PromotableOrder {
     public Map<String, Object> getExtraDataMap() {
         return extraDataMap;
     }
+
+	@Override
+	public Money calculateSubtotalForOffer() {
+		Money calculatedSubTotal = BroadleafCurrencyUtils.getMoney(order.getCurrency());
+        for (PromotableOrderItem orderItem : getAllOrderItems()) {
+        	if (orderItem.getOrderItem().appliesToOrderOffer()) {
+        		calculatedSubTotal = calculatedSubTotal.add(orderItem.calculateTotalWithAdjustments());
+        	}
+        }
+        return calculatedSubTotal;
+	}
 }

@@ -96,6 +96,31 @@ public class BroadleafLocaleResolverImpl implements BroadleafLocaleResolver {
             }
 
         }
+        
+        //try guessing from request locale
+        if (locale == null) {
+        	java.util.Locale reqLocale = request.getLocale();
+        	if (reqLocale != null) {
+	        	int score = 0;
+	        	for (Locale candidate: localeService.findAllLocales()) {        	
+	        		if (candidate.getLocaleCode().length() >= 5) {
+		        		String language = candidate.getLocaleCode().substring(0,2);
+		        		String country = candidate.getLocaleCode().substring(3,5);
+		        		if (score < 3 && language.equals(reqLocale.getLanguage()) && 
+		        				country.equals(reqLocale.getCountry())) {
+		        			locale = candidate;
+		        			score = 3;
+		        		} else if (score < 2 && language.equals(reqLocale.getLanguage())) {
+		        			locale = candidate;
+		        			score = 2;
+		        		} else if (score < 1 && country.equals(reqLocale.getCountry())) {
+		        			locale = candidate;
+		        			score = 1;
+		        		} 
+	        		}
+	        	}
+        	}
+        }
 
         // Finally, use the default
         if (locale == null) {

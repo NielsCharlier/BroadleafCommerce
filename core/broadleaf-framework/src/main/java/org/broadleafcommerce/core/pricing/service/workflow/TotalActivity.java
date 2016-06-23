@@ -52,16 +52,16 @@ public class TotalActivity extends BaseActivity<ProcessContext<Order>> {
         total = total.subtract(order.getOrderAdjustmentsValue());
         total = total.add(order.getTotalShipping());
         // There may not be any taxes on the order
-        if (order.getTotalTax() != null) {
+        /*if (order.getTotalTax() != null) {
             total = total.add(order.getTotalTax());
-        }
+        }*/
 
         Money fees = BroadleafCurrencyUtils.getMoney(BigDecimal.ZERO, order.getCurrency());
         for (FulfillmentGroup fulfillmentGroup : order.getFulfillmentGroups()) {
             Money fgTotal = BroadleafCurrencyUtils.getMoney(BigDecimal.ZERO, order.getCurrency());
             fgTotal = fgTotal.add(fulfillmentGroup.getMerchandiseTotal());
             fgTotal = fgTotal.add(fulfillmentGroup.getShippingPrice());
-            fgTotal = fgTotal.add(fulfillmentGroup.getTotalTax());
+            //fgTotal = fgTotal.add(fulfillmentGroup.getTotalTax());
             
             for (FulfillmentGroupFee fulfillmentGroupFee : fulfillmentGroup.getFulfillmentGroupFees()) {
                 fgTotal = fgTotal.add(fulfillmentGroupFee.getAmount());

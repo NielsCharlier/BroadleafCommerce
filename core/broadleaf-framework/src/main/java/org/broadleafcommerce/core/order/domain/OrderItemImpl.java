@@ -948,4 +948,10 @@ public class OrderItemImpl implements OrderItem, Cloneable, AdminMainEntity, Cur
         //abstract method, by default return true
         return true;
     }
+
+	@Override
+	public boolean appliesToOrderOffer() {
+		//abstract method, by default return true
+		return true;
+	}
 }

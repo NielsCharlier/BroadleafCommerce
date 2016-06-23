@@ -29,8 +29,10 @@ import org.broadleafcommerce.common.web.BroadleafRequestContext;
 import org.broadleafcommerce.common.web.payment.controller.PaymentGatewayAbstractController;
 import org.broadleafcommerce.core.order.domain.FulfillmentGroup;
 import org.broadleafcommerce.core.order.domain.FulfillmentOption;
+import org.broadleafcommerce.core.order.domain.GiftWrapOrderItem;
 import org.broadleafcommerce.core.order.domain.NullOrderImpl;
 import org.broadleafcommerce.core.order.domain.Order;
+import org.broadleafcommerce.core.order.domain.OrderItem;
 import org.broadleafcommerce.core.order.service.FulfillmentGroupService;
 import org.broadleafcommerce.core.order.service.FulfillmentOptionService;
 import org.broadleafcommerce.core.payment.domain.OrderPayment;
@@ -44,7 +46,9 @@ import org.broadleafcommerce.core.web.checkout.section.CheckoutSectionDTO;
 import org.broadleafcommerce.core.web.checkout.section.CheckoutSectionStateType;
 import org.broadleafcommerce.core.web.checkout.section.CheckoutSectionViewType;
 import org.broadleafcommerce.core.web.order.CartState;
+import org.broadleafcommerce.profile.core.domain.AddressImpl;
 import org.broadleafcommerce.profile.core.domain.CustomerAddress;
+import org.broadleafcommerce.profile.core.domain.PhoneImpl;
 import org.broadleafcommerce.profile.core.service.CountryService;
 import org.broadleafcommerce.profile.core.service.CustomerAddressService;
 import org.broadleafcommerce.profile.core.service.StateService;
@@ -204,36 +208,62 @@ public class OnePageCheckoutProcessor extends AbstractLocalVariableDefinitionEle
             orderInfoForm.setEmailAddress(cart.getEmailAddress());
         }
 
-        FulfillmentGroup firstShippableFulfillmentGroup = fulfillmentGroupService.getFirstShippableFulfillmentGroup(cart);
-        if (firstShippableFulfillmentGroup != null) {
-            //if the cart has already has fulfillment information
-            if (firstShippableFulfillmentGroup.getAddress()!=null) {
-                shippingForm.setAddress(firstShippableFulfillmentGroup.getAddress());
-            } else {
-                //check for a default address for the customer
-                CustomerAddress defaultAddress = customerAddressService.findDefaultCustomerAddress(CustomerState.getCustomer().getId());
-                if (defaultAddress != null) {
-                    shippingForm.setAddress(defaultAddress.getAddress());
-                    shippingForm.setAddressName(defaultAddress.getAddressName());
-                }
-            }
-
-            FulfillmentOption fulfillmentOption = firstShippableFulfillmentGroup.getFulfillmentOption();
-            if (fulfillmentOption != null) {
-                shippingForm.setFulfillmentOption(fulfillmentOption);
-                shippingForm.setFulfillmentOptionId(fulfillmentOption.getId());
-            }
+        if (!billingForm.isDirty()) {
+        	boolean found = false;
+	        if (cart.getPayments() != null) {
+	            for (OrderPayment payment : cart.getPayments()) {
+	                if (payment.getBillingAddress() != null) {
+	                	billingForm.setAddress(payment.getBillingAddress());
+	                	found = true;
+	                }
+	            }
+	        }
+			if (!found && CustomerState.getCustomer() != null) {
+				CustomerAddress customerAddress = customerAddressService.findDefaultCustomerAddress(CustomerState.getCustomer().getId());
+				if (customerAddress != null) {
+					billingForm.setAddress(customerAddress.getAddress());
+					billingForm.setDirty(true);
+				} else {
+					billingForm.getAddress().setFirstName(CustomerState.getCustomer().getFirstName());
+					billingForm.getAddress().setLastName(CustomerState.getCustomer().getLastName());
+				}
+			}
         }
+        
+        if (!shippingForm.isDirty()) {
+	        FulfillmentGroup firstShippableFulfillmentGroup = fulfillmentGroupService.getFirstShippableFulfillmentGroup(cart);
+	        if (firstShippableFulfillmentGroup != null) {
+	        	if (firstShippableFulfillmentGroup.getPersonalMessage() != null) {
+	        		shippingForm.setPersonalMessage(firstShippableFulfillmentGroup.getPersonalMessage());
+	        	}
 
-
-        if (cart.getPayments() != null) {
-            for (OrderPayment payment : cart.getPayments()) {
-                if (PaymentType.CREDIT_CARD.equals(payment.getType())) {
-                    if (payment.getBillingAddress() != null) {
-                        billingForm.setAddress(payment.getBillingAddress());
-                    }
-                }
-            }
+	            //if the cart has already has fulfillment information
+	            if (firstShippableFulfillmentGroup.getAddress()!=null) {
+	                shippingForm.setAddress(firstShippableFulfillmentGroup.getAddress());
+	            } else {
+	            	//copy billing info form
+	            	if (billingForm.getAddress().getId() != null) {
+	            		shippingForm.setUseBillingAddress(true);
+	            		shippingForm.setAddress(billingForm.getAddress());
+	                    shippingForm.setAddressName(billingForm.getAddressName());
+	                    shippingForm.setDirty(true);
+	            	} else {            	
+		                //check for a default address for the customer
+		                CustomerAddress defaultAddress = customerAddressService.findDefaultCustomerAddress(CustomerState.getCustomer().getId());
+		                if (defaultAddress != null) {
+		                    shippingForm.setAddress(defaultAddress.getAddress());
+		                    shippingForm.setAddressName(defaultAddress.getAddressName());
+		                    shippingForm.setDirty(true);
+		                }
+	            	}
+	            }
+	
+	            FulfillmentOption fulfillmentOption = firstShippableFulfillmentGroup.getFulfillmentOption();
+	            if (fulfillmentOption != null) {
+	                shippingForm.setFulfillmentOption(fulfillmentOption);
+	                shippingForm.setFulfillmentOptionId(fulfillmentOption.getId());
+	            }
+	        }
         }
     }
 
@@ -292,31 +322,10 @@ public class OnePageCheckoutProcessor extends AbstractLocalVariableDefinitionEle
             showShippingInfoSection = false;
         }
 
-        boolean orderContainsThirdPartyPayment = false;
-        boolean orderContainsUnconfirmedCreditCard = false;
-        OrderPayment unconfirmedCC = null;
-        if (CartState.getCart().getPayments() != null) {
-            for (OrderPayment payment : CartState.getCart().getPayments()) {
-                if (payment.isActive() &&
-                        PaymentType.THIRD_PARTY_ACCOUNT.equals(payment.getType())) {
-                    orderContainsThirdPartyPayment = true;
-                }
-                if (payment.isActive() &&
-                        (PaymentType.CREDIT_CARD.equals(payment.getType()) &&
-                                !PaymentGatewayType.TEMPORARY.equals(payment.getGatewayType()))) {
-                    orderContainsUnconfirmedCreditCard = true;
-                    unconfirmedCC = payment;
-                }
-            }
-        }
-
         //Toggle the Payment Info Section based on what payments were applied to the order
         //(e.g. Third Party Account (i.e. PayPal Express) or Gift Cards/Customer Credit)
         Money orderTotalAfterAppliedPayments = CartState.getCart().getTotalAfterAppliedPayments();
-        if (orderContainsThirdPartyPayment || orderContainsUnconfirmedCreditCard) {
-            showBillingInfoSection = false;
-            showAllPaymentMethods = false;
-        } else if (orderTotalAfterAppliedPayments != null
+        if (orderTotalAfterAppliedPayments != null
                 && orderTotalAfterAppliedPayments.isZero()){
             //If all the applied payments (e.g. gift cards) cover the entire amount
             //we don't need to show all payment method options.
@@ -325,9 +334,6 @@ public class OnePageCheckoutProcessor extends AbstractLocalVariableDefinitionEle
 
         localVars.put("showBillingInfoSection", showBillingInfoSection);
         localVars.put("showAllPaymentMethods", showAllPaymentMethods);
-        localVars.put("orderContainsThirdPartyPayment", orderContainsThirdPartyPayment);
-        localVars.put("orderContainsUnconfirmedCreditCard", orderContainsUnconfirmedCreditCard);
-        localVars.put("unconfirmedCC", unconfirmedCC);
 
         //The Sections are all initialized to INACTIVE view
         List<CheckoutSectionDTO> drawnSections = new LinkedList<CheckoutSectionDTO>();
@@ -445,7 +451,10 @@ public class OnePageCheckoutProcessor extends AbstractLocalVariableDefinitionEle
             options.addAll(fulfillmentOptions);
             FulfillmentEstimationResponse estimateResponse = null;
             try {
-                estimateResponse = fulfillmentPricingService.estimateCostForFulfillmentGroup(fulfillmentGroupService.getFirstShippableFulfillmentGroup(cart), options);
+            	FulfillmentGroup fullfillmentGroup = fulfillmentGroupService.getFirstShippableFulfillmentGroup(cart);
+            	if (fullfillmentGroup != null) {
+            		estimateResponse = fulfillmentPricingService.estimateCostForFulfillmentGroup(fullfillmentGroup, options);
+            	}
             } catch (FulfillmentPriceException e) {
 
             }
@@ -478,9 +487,7 @@ public class OnePageCheckoutProcessor extends AbstractLocalVariableDefinitionEle
         }
 
         for (OrderPayment payment : cart.getPayments()) {
-            if (payment.isActive() &&
-                    PaymentType.CREDIT_CARD.equals(payment.getType()) &&
-                    payment.getBillingAddress() != null) {
+            if (payment.isActive() && payment.getBillingAddress() != null) {
                 return true;
             }
         }

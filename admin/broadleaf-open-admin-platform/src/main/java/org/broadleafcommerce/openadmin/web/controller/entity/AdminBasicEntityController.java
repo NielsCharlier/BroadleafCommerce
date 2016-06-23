@@ -325,6 +325,8 @@ public class AdminBasicEntityController extends AdminAbstractController {
             return "modules/modalContainer";
         }
         
+        onSuccesfulSave(entity.getPMap().get("id").getValue());
+        
         // Note that AJAX Redirects need the context path prepended to them
         return "ajaxredirect:" + getContextPath(request) + sectionKey + "/" + entity.getPMap().get("id").getValue();
     }
@@ -545,12 +547,19 @@ public class AdminBasicEntityController extends AdminAbstractController {
             }
         }
         
+        onSuccesfulSave(id);
+        
         ra.addFlashAttribute("headerFlash", "save.successful");
         
         return "redirect:/" + sectionKey + "/" + id;
     }
 
-    /**
+    protected void onSuccesfulSave(String id) {
+		// hook
+		
+	}
+
+	/**
      * Attempts to remove the given entity.
      * 
      * @param request

@@ -217,7 +217,7 @@ public class GoogleAnalyticsProcessor extends AbstractModelVariableModifierProce
     protected Address getBillingAddress(Order order) {
         Address address = null;
         for (OrderPayment payment : order.getPayments())  {
-            if (payment.isActive() && PaymentType.CREDIT_CARD.equals(payment.getType())) {
+            if (payment.isActive() && payment.getBillingAddress() != null) {
                 address = payment.getBillingAddress();
             }
         }
