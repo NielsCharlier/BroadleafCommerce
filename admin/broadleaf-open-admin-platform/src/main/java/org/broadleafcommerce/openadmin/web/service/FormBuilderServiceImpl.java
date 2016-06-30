@@ -416,7 +416,7 @@ public class FormBuilderServiceImpl implements FormBuilderService {
         String sectionIdentifier = extractSectionIdentifierFromCrumb(sectionCrumbs);
         AdminSection section = navigationService.findAdminSectionByClassAndSectionId(className, sectionIdentifier);
         if (section != null) {
-            listGrid.setExternalEntitySectionKey(section.getUrl());
+            listGrid.setExternalEntitySectionKey(section.getSectionKey());
         }
 
         // For each of the entities (rows) in the list grid, we need to build the associated
@@ -674,7 +674,7 @@ public class FormBuilderServiceImpl implements FormBuilderService {
         AdminSection section = navigationService.findAdminSectionByClassAndSectionId(cmd.getCeilingType(),
                 sectionIdentifier);
         if (section != null) {
-            ef.setSectionKey(section.getUrl());
+            ef.setSectionKey(section.getSectionKey());
         } else {
             ef.setSectionKey(cmd.getCeilingType());
         }

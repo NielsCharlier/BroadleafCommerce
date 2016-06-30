@@ -687,7 +687,7 @@ public class AdminBasicEntityController extends AdminAbstractController {
         BasicFieldMetadata md = (BasicFieldMetadata) collectionProperty.getMetadata();
 
         AdminSection section = adminNavigationService.findAdminSectionByClassAndSectionId(md.getForeignKeyClass(), sectionKey);
-        String sectionUrlKey = (section.getUrl().startsWith("/")) ? section.getUrl().substring(1) : section.getUrl();
+        String sectionUrlKey = (section.getSectionKey().startsWith("/")) ? section.getSectionKey().substring(1) : section.getSectionKey();
         Map<String, String> varsForField = new HashMap<String, String>();
         varsForField.put("sectionKey", sectionUrlKey);
         return viewEntityForm(request, response, model, varsForField, id);

@@ -57,7 +57,7 @@
 
     <named-query name="BC_READ_ADMIN_SECTION_BY_URI">
         <query>SELECT adminSection FROM org.broadleafcommerce.openadmin.server.security.domain.AdminSection adminSection
-                WHERE adminSection.url = :uri
+                WHERE adminSection.sectionKey = :uri
         </query>
     </named-query>
 

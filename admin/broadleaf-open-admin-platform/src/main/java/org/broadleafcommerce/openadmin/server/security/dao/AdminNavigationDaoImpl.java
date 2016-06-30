@@ -106,7 +106,7 @@ public class AdminNavigationDaoImpl implements AdminNavigationDao {
                     sectionId = "/" + sectionId;
                 }
                 for (AdminSection section : sections) {
-                    if (sectionId.equals(section.getUrl())) {
+                    if (sectionId.equals(section.getSectionKey())) {
                         returnSection = section;
                         break;
                     }

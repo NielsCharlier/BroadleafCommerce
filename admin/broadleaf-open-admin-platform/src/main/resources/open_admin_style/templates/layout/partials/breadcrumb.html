@@ -5,7 +5,7 @@
         </li>
         <li>
             <a blc_admin:admin_section_href="${currentAdminSection}" th:inline="text">
-                [[#{${currentAdminSection.sectionKey}}]]
+                [[#{${currentAdminSection.name}}]]
             </a>
         </li>
         <li th:if="${entityForm}">
