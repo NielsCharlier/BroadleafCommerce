@@ -76,13 +76,14 @@ public class ProductOptionImpl implements ProductOption, AdminMainEntity {
     protected String type;
     
     @Column(name = "ATTRIBUTE_NAME")
-    @AdminPresentation(friendlyName = "productOption_name", helpText = "productOption_nameHelp", requiredOverride = RequiredOverride.REQUIRED)
+    @AdminPresentation(friendlyName = "productOption_name", 
+            prominent = true, helpText = "productOption_nameHelp", requiredOverride = RequiredOverride.REQUIRED,
+            order = 0, gridOrder = 0)
     protected String attributeName;
     
     @Column(name = "LABEL")
-    @AdminPresentation(friendlyName = "productOption_Label", helpText = "productOption_labelHelp", 
-        prominent = true,
-        translatable = true)
+    @AdminPresentation(friendlyName = "productOption_Label", helpText = "productOption_labelHelp",
+    		prominent = true, translatable = true, order = 1, gridOrder = 1)
     protected String label;
 
     @Column(name = "REQUIRED")

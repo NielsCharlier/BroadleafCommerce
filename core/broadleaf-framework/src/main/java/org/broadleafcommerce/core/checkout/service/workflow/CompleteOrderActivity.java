@@ -61,7 +61,7 @@ public class CompleteOrderActivity extends BaseActivity<ProcessContext<CheckoutS
     }
 
     protected String determineOrderNumber(Order order) {
-        return new SimpleDateFormat("yyyyMMddHHmmssS").format(SystemTime.asDate()) + order.getId();
+        return new SimpleDateFormat("yyyyMMdd").format(SystemTime.asDate()) + order.getId();
     }
 
     protected OrderStatus getCompletedStatus() {

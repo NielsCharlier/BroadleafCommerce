@@ -70,7 +70,7 @@
         
         convertToUrlFragment : function convertToUrlFragment(val, options) {
             if (options != null && options.allowSlash) {
-                return val = val.replace(/ /g, BLC.systemProperty.urlFragmentSeparator).replace(/[^\w\s_-\/]/gi, '').toLowerCase();
+                return val = val.replace(/ /g, BLC.systemProperty.urlFragmentSeparator).replace(/[^\w\s_\/-]/gi, '').toLowerCase();
             } else {
                 return val = val.replace(/ /g, BLC.systemProperty.urlFragmentSeparator).replace(/[^\w\s_-]/gi, '').toLowerCase();
             }

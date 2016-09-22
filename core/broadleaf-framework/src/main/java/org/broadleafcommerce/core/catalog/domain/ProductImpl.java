@@ -270,7 +270,7 @@ public class ProductImpl implements Product, Status, AdminMainEntity, Locatable,
             tab = Presentation.Tab.Name.Marketing, tabOrder = Presentation.Tab.Order.Marketing,
             targetObjectProperty = "category",
             parentObjectProperty = "product",
-            gridVisibleFields = { "name" })
+            gridVisibleFields = { "name" }, readOnly = true)
     protected List<CategoryProductXref> allParentCategoryXrefs = new ArrayList<CategoryProductXref>();
 
     @OneToMany(mappedBy = "product", targetEntity = ProductAttributeImpl.class, cascade = { CascadeType.ALL }, orphanRemoval = true)

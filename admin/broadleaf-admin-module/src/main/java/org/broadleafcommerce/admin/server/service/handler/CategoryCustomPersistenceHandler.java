@@ -87,7 +87,7 @@ public class CategoryCustomPersistenceHandler extends CustomPersistenceHandlerAd
         Map<String, FieldMetadata> md = getMetadata(persistencePackage, helper);
 
         if (!isDefaultCategoryLegacyMode()) {
-            md.remove("allParentCategoryXrefs");
+            //md.remove("allParentCategoryXrefs");
 
             BasicFieldMetadata defaultCategory = ((BasicFieldMetadata) md.get("defaultParentCategory"));
             defaultCategory.setFriendlyName("CategoryImpl_ParentCategory");

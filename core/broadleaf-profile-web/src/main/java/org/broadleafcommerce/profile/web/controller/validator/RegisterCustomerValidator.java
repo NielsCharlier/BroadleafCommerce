@@ -36,7 +36,8 @@ import javax.annotation.Resource;
 @Component("blRegisterCustomerValidator")
 public class RegisterCustomerValidator implements Validator {
 
-    private String validatePasswordExpression = "[0-9A-Za-z]{4,15}";
+    //private String validatePasswordExpression = "[0-9A-Za-z]{4,15}";
+	private String validatePasswordExpression = ".{6,}";
 
     @Resource(name="blCustomerService")
     private CustomerService customerService;

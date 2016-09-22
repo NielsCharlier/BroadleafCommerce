@@ -96,7 +96,22 @@ public class ProductOptionValueImpl implements ProductOptionValue {
 
     @Override
     public String getAttributeValue() {
+    	String attributeValue = this.attributeValue;
+    	int i = attributeValue.indexOf('#');
+    	if (i >= 0) {
+    		attributeValue = attributeValue.substring(0, i);
+    	}
         return DynamicTranslationProvider.getValue(this, "attributeValue", attributeValue);
+    }
+    
+    @Override
+    public String getAttributeInfo() {
+    	String attributeInfo = null;
+    	int i = attributeValue.indexOf('#');
+    	if (i >= 0) {
+    		attributeInfo = attributeValue.substring(i);
+    	}
+        return attributeInfo;
     }
 
     @Override

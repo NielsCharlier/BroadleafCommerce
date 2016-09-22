@@ -44,8 +44,8 @@ public class Resize extends BaseFilter {
 
     public Resize(int targetWidth, int targetHeight, boolean highQuality, boolean maintainAspectRatio, boolean reduceOnly, RenderingHints hints) {
         this.hints = hints;
-        this.targetWidth = targetWidth;
-        this.targetHeight = targetHeight;
+        this.targetWidth = targetWidth == 0 ? Integer.MAX_VALUE : targetWidth;
+        this.targetHeight = targetHeight == 0 ? Integer.MAX_VALUE : targetHeight;
         this.highQuality = highQuality;
         this.hint = RenderingHints.VALUE_INTERPOLATION_BICUBIC;
         this.maintainAspectRatio = maintainAspectRatio;
@@ -127,14 +127,19 @@ public class Resize extends BaseFilter {
         return dst;
     }
     
-    private BufferedImage getScaledInstance(BufferedImage img, int targetWidth, int targetHeight, Object hint, boolean higherQuality, boolean maintainAspectRatio, boolean reduceOnly) {
-        BufferedImage ret = (BufferedImage) img;
+    private static BufferedImage getScaledInstance(BufferedImage img, int targetWidth, int targetHeight, Object hint, boolean higherQuality, boolean maintainAspectRatio, boolean reduceOnly) {
+        if (reduceOnly) {
+        	targetWidth = Math.min(targetWidth, img.getWidth());
+        	targetHeight = Math.min(targetHeight, img.getHeight());
+        }
+    	
+    	BufferedImage ret = (BufferedImage) img;
         int w, h, destW, destH;
 
         if (maintainAspectRatio) {
             int wDiff = Math.abs(img.getWidth() - targetWidth);
             int hDiff = Math.abs(img.getHeight() - targetHeight);
-            if (wDiff > hDiff) {
+            if (wDiff < hDiff) {
                 destH = targetHeight;
                 destW = Double.valueOf((((double) img.getWidth()) * ((double) destH))/((double) img.getHeight())).intValue();
             } else {

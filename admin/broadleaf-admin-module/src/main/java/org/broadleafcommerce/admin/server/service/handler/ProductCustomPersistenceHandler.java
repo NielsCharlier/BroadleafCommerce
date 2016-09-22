@@ -119,7 +119,7 @@ public class ProductCustomPersistenceHandler extends CustomPersistenceHandlerAda
         Map<String, FieldMetadata> md = getMetadata(persistencePackage, helper);
 
         if (!isDefaultCategoryLegacyMode()) {
-            md.remove("allParentCategoryXrefs");
+            //md.remove("allParentCategoryXrefs");
 
             BasicFieldMetadata defaultCategory = ((BasicFieldMetadata) md.get("defaultCategory"));
             defaultCategory.setFriendlyName("ProductImpl_Parent_Category");

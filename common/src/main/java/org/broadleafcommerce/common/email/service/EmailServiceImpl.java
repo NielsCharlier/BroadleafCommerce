@@ -94,8 +94,9 @@ public class EmailServiceImpl implements EmailService {
             emailInfo = new EmailInfo();
         }
         
+        String originalSubject = emailInfo.getSubject();
         emailInfo.setSubject(messageSource.getMessage(emailInfo.getSubject(), null, emailInfo.getSubject(), 
-        		BroadleafRequestContext.getBroadleafRequestContext().getJavaLocale()));       
+        		BroadleafRequestContext.getBroadleafRequestContext().getJavaLocale()));
 
         props.put(EmailPropertyType.INFO.getType(), emailInfo);
         props.put(EmailPropertyType.USER.getType(), emailTarget);
@@ -108,6 +109,8 @@ public class EmailServiceImpl implements EmailService {
         } else {
             messageCreator.sendMessage(props);
         }
+        
+        emailInfo.setSubject(originalSubject);
 
         return true;
     }

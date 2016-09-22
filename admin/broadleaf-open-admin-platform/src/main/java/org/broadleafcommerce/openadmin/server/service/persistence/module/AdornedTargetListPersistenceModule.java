@@ -349,9 +349,11 @@ public class AdornedTargetListPersistenceModule extends BasicPersistenceModule {
                 myRecord = records.get(index);
                 
                 BigDecimal requestedSequence = new BigDecimal(entity.findProperty(adornedTargetList.getSortField()).getValue());
-                BigDecimal previousSequence = new BigDecimal(String.valueOf(getFieldManager().getFieldValue(myRecord, adornedTargetList.getSortField())));
+                BigDecimal previousSequence =
+                		getFieldManager().getFieldValue(myRecord, adornedTargetList.getSortField()) == null ? null : 
+                		new BigDecimal(String.valueOf(getFieldManager().getFieldValue(myRecord, adornedTargetList.getSortField())));
                 
-                if (!previousSequence.equals(requestedSequence)) {
+                if (previousSequence == null || !previousSequence.equals(requestedSequence)) {
                     // Sequence has changed. Rebalance the list
                     myRecord = records.remove(index);
                     myRecord = createPopulatedInstance(myRecord, entity, mergedProperties, false);

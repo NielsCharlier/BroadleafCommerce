@@ -291,7 +291,7 @@ public class CategoryImpl implements Category, Status, AdminMainEntity, Locatabl
             friendlyName = "allParentCategoriesTitle",
             sortProperty = "displayOrder",
             tab = Presentation.Tab.Name.Advanced, tabOrder = Presentation.Tab.Order.Advanced,
-            gridVisibleFields = { "name" })
+            gridVisibleFields = { "name" }, readOnly = true)
     protected List<CategoryXref> allParentCategoryXrefs = new ArrayList<CategoryXref>(10);
 
     @OneToMany(targetEntity = CategoryProductXrefImpl.class, mappedBy = "category", orphanRemoval = true,

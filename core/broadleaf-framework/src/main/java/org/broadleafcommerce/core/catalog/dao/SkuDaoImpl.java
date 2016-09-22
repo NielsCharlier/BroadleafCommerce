@@ -239,6 +239,9 @@ public class SkuDaoImpl implements SkuDao {
 
         // Add the restrictions to the criteria query
         criteria.where(restrictions.toArray(new Predicate[restrictions.size()]));
+        
+        //pagination seems to fail without this, strangely enough
+        criteria.orderBy(builder.asc(sku.get("id")));
 
         int firstResult = page * pageSize;
         TypedQuery<Sku> query = em.createQuery(criteria);

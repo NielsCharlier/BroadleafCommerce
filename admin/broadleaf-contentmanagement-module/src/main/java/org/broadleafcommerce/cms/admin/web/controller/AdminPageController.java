@@ -92,6 +92,7 @@ public class AdminPageController extends AdminBasicEntityController {
         EntityForm dynamicForm = getDynamicFieldTemplateForm(info, id, null);
         ef.putDynamicFormInfo("pageTemplate", info);
         ef.putDynamicForm("pageTemplate", dynamicForm);
+        dynamicForm.setTranslationCeilingEntity("org.broadleafcommerce.cms.page.domain.Page");
 
         // Mark the field that will drive this dynamic form
         addOnChangeTrigger(ef);
