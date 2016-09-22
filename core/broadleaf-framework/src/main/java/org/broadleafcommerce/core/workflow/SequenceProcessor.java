@@ -77,6 +77,7 @@ public class SequenceProcessor extends BaseProcessor {
                         context = activity.execute(context);
                     } catch (Throwable th) {
                         try {
+                        	LOG.error("Exception during sequence processor, rolling back now.", th);
                             if (getAutoRollbackOnError()) {
                                 LOG.info("Automatically rolling back state for any previously registered " +
                                         "RollbackHandlers. RollbackHandlers may be registered for workflow activities" +
