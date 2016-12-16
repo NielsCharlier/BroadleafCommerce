@@ -236,6 +236,10 @@ public class OnePageCheckoutProcessor extends AbstractLocalVariableDefinitionEle
 	        	if (firstShippableFulfillmentGroup.getPersonalMessage() != null) {
 	        		shippingForm.setPersonalMessage(firstShippableFulfillmentGroup.getPersonalMessage());
 	        	}
+	        	
+	        	if (firstShippableFulfillmentGroup.getDeliveryInstruction() != null) {
+	        		shippingForm.setDeliveryMessage(firstShippableFulfillmentGroup.getDeliveryInstruction());
+	        	}
 
 	            //if the cart has already has fulfillment information
 	            if (firstShippableFulfillmentGroup.getAddress()!=null) {
