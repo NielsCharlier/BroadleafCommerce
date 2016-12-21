@@ -120,7 +120,7 @@ public class CustomerImpl implements Customer, AdminMainEntity, Previewable {
     @Column(name = "RECEIVE_EMAIL")
     @AdminPresentation(friendlyName = "CustomerImpl_Customer_Receive_Email",order=1000, 
             tab = Presentation.Tab.Name.Advanced, tabOrder = Presentation.Tab.Order.Advanced)
-    protected Boolean receiveEmail = true;
+    protected Boolean receiveEmail = false;
 
     @Column(name = "IS_REGISTERED")
     @AdminPresentation(friendlyName = "CustomerImpl_Customer_Registered", order = 4000,
