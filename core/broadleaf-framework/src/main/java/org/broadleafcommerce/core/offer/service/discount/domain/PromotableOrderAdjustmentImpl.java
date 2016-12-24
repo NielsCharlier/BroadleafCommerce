@@ -84,7 +84,7 @@ public class PromotableOrderAdjustmentImpl implements PromotableOrderAdjustment 
 
         // Note: FIXED_PRICE not calculated as this is not a valid option for offers.
         if (offer.getDiscountType().equals(OfferDiscountType.AMOUNT_OFF)) {
-            adjustmentValue = Money.max(currentOrderValue, new Money(offer.getValue(), promotableOrder.getOrderCurrency()));            
+            adjustmentValue = Money.min(currentOrderValue, new Money(offer.getValue(), promotableOrder.getOrderCurrency()));            
         } else if (offer.getDiscountType().equals(OfferDiscountType.PERCENT_OFF)) {
             BigDecimal offerValue = currentOrderValue.getAmount().multiply(offer.getValue().divide(new BigDecimal("100"), 5, RoundingMode.HALF_EVEN));
             
