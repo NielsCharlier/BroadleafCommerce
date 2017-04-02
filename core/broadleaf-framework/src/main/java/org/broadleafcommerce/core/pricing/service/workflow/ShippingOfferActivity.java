@@ -34,7 +34,7 @@ public class ShippingOfferActivity extends BaseActivity<ProcessContext<Order>> {
     @Override
     public ProcessContext<Order> execute(ProcessContext<Order> context) throws Exception {
         Order order = context.getSeedData();
-        order.getReadyForFilter();
+        order.getReadyForFilter(true);
         shippingOfferService.reviewOffers(order);
         context.setSeedData(order);
 

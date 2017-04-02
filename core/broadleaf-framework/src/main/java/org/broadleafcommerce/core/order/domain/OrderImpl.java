@@ -845,5 +845,5 @@ public class OrderImpl implements Order, AdminMainEntity, CurrencyCodeIdentifiab
     }
 
 	@Override
-	public void getReadyForFilter() {}
+	public void getReadyForFilter(boolean withAdjustments) {}
 }

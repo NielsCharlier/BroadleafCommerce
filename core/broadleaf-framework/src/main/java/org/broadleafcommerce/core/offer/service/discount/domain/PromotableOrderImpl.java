@@ -78,7 +78,7 @@ public class PromotableOrderImpl implements PromotableOrder {
     
     @Override 
     public void getReadyForFilter() {
-    	order.getReadyForFilter();
+    	order.getReadyForFilter(false);
     }
 
     @Override

@@ -215,8 +215,8 @@ public class OrderDaoImpl implements OrderDao {
                         "such a case, the defaultBatchStart property of IdGenerationDaoImpl (spring id of " +
                         "blIdGenerationDao) should be set to the appropriate start value.");
             }*/
-            customer = customerDao.save(customer);
         }
+        customer = customerDao.save(customer);
         order.setCustomer(customer);
         order.setEmailAddress(customer.getEmailAddress());
         order.setStatus(OrderStatus.IN_PROCESS);

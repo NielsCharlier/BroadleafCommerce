@@ -388,5 +388,5 @@ public class NullOrderImpl implements Order {
     }
 
 	@Override
-	public void getReadyForFilter() {}
+	public void getReadyForFilter(boolean withAdjustments) {}
 }

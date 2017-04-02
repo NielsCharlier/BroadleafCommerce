@@ -23,6 +23,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.broadleafcommerce.core.catalog.dao.SkuDao;
+import org.broadleafcommerce.core.catalog.domain.Sku;
 import org.broadleafcommerce.core.offer.dao.CustomerOfferDao;
 import org.broadleafcommerce.core.offer.dao.OfferCodeDao;
 import org.broadleafcommerce.core.offer.dao.OfferDao;
@@ -30,6 +32,7 @@ import org.broadleafcommerce.core.offer.domain.Adjustment;
 import org.broadleafcommerce.core.offer.domain.CustomerOffer;
 import org.broadleafcommerce.core.offer.domain.Offer;
 import org.broadleafcommerce.core.offer.domain.OfferCode;
+import org.broadleafcommerce.core.offer.domain.OfferTargetCriteriaXref;
 import org.broadleafcommerce.core.offer.domain.OrderItemPriceDetailAdjustment;
 import org.broadleafcommerce.core.offer.service.discount.domain.PromotableCandidateFulfillmentGroupOffer;
 import org.broadleafcommerce.core.offer.service.discount.domain.PromotableCandidateItemOffer;
@@ -39,12 +42,17 @@ import org.broadleafcommerce.core.offer.service.discount.domain.PromotableOrder;
 import org.broadleafcommerce.core.offer.service.processor.FulfillmentGroupOfferProcessor;
 import org.broadleafcommerce.core.offer.service.processor.ItemOfferProcessor;
 import org.broadleafcommerce.core.offer.service.processor.OrderOfferProcessor;
+import org.broadleafcommerce.core.offer.service.type.OfferDiscountType;
 import org.broadleafcommerce.core.offer.service.type.OfferType;
+import org.broadleafcommerce.core.order.domain.DiscreteOrderItem;
 import org.broadleafcommerce.core.order.domain.FulfillmentGroup;
 import org.broadleafcommerce.core.order.domain.Order;
 import org.broadleafcommerce.core.order.domain.OrderItem;
 import org.broadleafcommerce.core.order.domain.OrderItemPriceDetail;
 import org.broadleafcommerce.core.order.service.OrderService;
+import org.broadleafcommerce.core.order.service.call.AddToCartItem;
+import org.broadleafcommerce.core.order.service.exception.AddToCartException;
+import org.broadleafcommerce.core.order.service.exception.RemoveFromCartException;
 import org.broadleafcommerce.core.pricing.service.exception.PricingException;
 import org.broadleafcommerce.profile.core.domain.Customer;
 import org.springframework.stereotype.Service;
@@ -57,6 +65,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Resource;
@@ -99,6 +109,10 @@ public class OfferServiceImpl implements OfferService {
 
     @Resource(name = "blOrderService")
     protected OrderService orderService;
+
+    @Resource(name = "blSkuDao")
+    protected SkuDao skuDao;
+
 
     @Override
     public List<Offer> findAllOffers() {
@@ -284,6 +298,7 @@ public class OfferServiceImpl implements OfferService {
         call - see http://jira.broadleafcommerce.org/browse/BLC-664
          */
         OfferContext offerContext = OfferContext.getOfferContext();
+        List<OrderItem> freeOrderItems = new ArrayList<OrderItem>();        
         if (offerContext == null || offerContext.executePromotionCalculation) {
             PromotableOrder promotableOrder = promotableItemFactory.createPromotableOrder(order, false);
             List<Offer> filteredOffers = orderOfferProcessor.filterOffers(offers, order.getCustomer());
@@ -292,11 +307,40 @@ public class OfferServiceImpl implements OfferService {
                     LOG.trace("No offers applicable to this order.");
                 }
             } else {
+            	//auto-add products
+            	Pattern pattern = Pattern.compile("orderItem\\.\\?sku\\.\\?externalId==\"(.*)\"");      
+            	for (Offer offer : offers) {
+            		if (offer.getDiscountType() == OfferDiscountType.FIX_PRICE &&
+            				offer.getValue().doubleValue() == 0.0)
+	            		for (OfferTargetCriteriaXref crit : offer.getTargetItemCriteriaXref()) {
+	                        //auto add product
+	                        Matcher matcher = pattern.matcher(crit.getOfferItemCriteria().getMatchRule());
+	                        if (matcher.matches()) {
+	                        	String extId = matcher.group(1);
+	                        	Sku sku = skuDao.readSkuByExternalId(extId);	                        	
+	                        	if (orderService.findLastMatchingItem(order, sku.getId(), sku.getProduct().getId()) == null) {	
+	                        		AddToCartItem request = new AddToCartItem();
+	                        		request.setSkuId(sku.getId());
+	                        		request.setQuantity(1);   
+	                                request.setProductId(sku.getProduct().getId());
+	                                request.setCategoryId(sku.getProduct().getCategory().getId());
+	                        		try {
+										orderService.addItem(order.getId(), request, false);										
+										freeOrderItems.add(orderService.findLastMatchingItem(
+												order, sku.getId(), sku.getProduct().getId()));
+									} catch (AddToCartException e) {
+										LOG.warn(e);
+									}
+	                        	}
+	                        }
+	            		}
+            	}
+            	
                 List<PromotableCandidateOrderOffer> qualifiedOrderOffers = new ArrayList<PromotableCandidateOrderOffer>();
                 List<PromotableCandidateItemOffer> qualifiedItemOffers = new ArrayList<PromotableCandidateItemOffer>();
-
+                
                 itemOfferProcessor.filterOffers(promotableOrder, filteredOffers, qualifiedOrderOffers, qualifiedItemOffers);
-
+                
                 if (! (qualifiedItemOffers.isEmpty() && qualifiedOrderOffers.isEmpty())) {                
                     // At this point, we should have a PromotableOrder that contains PromotableItems each of which
                     // has a list of candidatePromotions that might be applied.
@@ -306,6 +350,17 @@ public class OfferServiceImpl implements OfferService {
                 }
             }
             orderOfferProcessor.synchronizeAdjustmentsAndPrices(promotableOrder);
+                        
+            //remove added offer items that were not discounted
+            for (OrderItem item : freeOrderItems) {
+            	if (!item.getTotalPrice().isZero()) {
+            		try {
+						orderService.removeItem(order.getId(), item.getId(), false);
+					} catch (RemoveFromCartException e) {
+						LOG.warn(e);
+					}
+            	}
+            }
             
             verifyAdjustments(order, true);
             
