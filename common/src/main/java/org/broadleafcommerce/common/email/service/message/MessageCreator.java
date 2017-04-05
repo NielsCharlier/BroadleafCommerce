@@ -20,7 +20,6 @@
 
 package org.broadleafcommerce.common.email.service.message;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.broadleafcommerce.common.email.domain.EmailTarget;
 import org.broadleafcommerce.common.email.service.info.EmailInfo;
 import org.springframework.mail.MailException;
@@ -28,10 +27,16 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Map;
 
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.parser.ParserDelegator;
 
 public abstract class MessageCreator {
 
@@ -55,8 +60,7 @@ public abstract class MessageCreator {
             public void prepare(MimeMessage mimeMessage) throws Exception {
                 EmailTarget emailUser = (EmailTarget) props.get(EmailPropertyType.USER.getType());
                 EmailInfo info = (EmailInfo) props.get(EmailPropertyType.INFO.getType());
-                boolean isMultipart = CollectionUtils.isNotEmpty(info.getAttachments());
-                MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, info.getEncoding());
+                MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, info.getEncoding());
                 message.setTo(emailUser.getEmailAddress());
                 message.setFrom(info.getFromAddress());
                 message.setSubject(info.getSubject());
@@ -70,7 +74,8 @@ public abstract class MessageCreator {
                 if (messageBody == null) {
                     messageBody = buildMessageBody(info, props);
                 }
-                message.setText(messageBody, true);
+                String plainMessageBody = htmlToPlain(messageBody);
+                message.setText(plainMessageBody, messageBody);
                 for (Attachment attachment : info.getAttachments()) {
                     ByteArrayDataSource dataSource = new ByteArrayDataSource(attachment.getData(), attachment.getMimeType());
                     message.addAttachment(attachment.getFilename(), dataSource);
@@ -88,4 +93,53 @@ public abstract class MessageCreator {
     public void setMailSender(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
+    
+    private static String htmlToPlain(String html) throws IOException {
+    	final StringBuilder sb = new StringBuilder();
+    	HTMLEditorKit.ParserCallback parserCallback = new HTMLEditorKit.ParserCallback() {
+    	    String link;
+
+    	    @Override
+    	    public void handleText(final char[] data, final int pos) {
+    	        String s = new String(data);
+    	        if (link != null && link.equals(s)) {
+    	        	link = null;
+    	        }
+    	        sb.append(s.trim());
+    	    }
+
+    	    @Override
+    	    public void handleStartTag(final HTML.Tag t, final MutableAttributeSet a, final int pos) {
+    	        if (t == HTML.Tag.BR) {
+    	        	sb.append("\n");
+    	        }
+    	    	if (t == HTML.Tag.A) {
+    	        	link = a.getAttribute(HTML.Attribute.HREF).toString();
+    	        }
+    	        if (t == HTML.Tag.IMG) {
+    	        	sb.append(a.getAttribute(HTML.Attribute.ALT));
+    	        }
+    	    }
+    	    
+    	    @Override
+    	    public void handleEndTag(HTML.Tag t, int pos) {
+    	        if (t == HTML.Tag.A && link != null) {
+    	        	sb.append(" <" + link + "> ");
+    	        	link = null;
+    	        }
+    	        if (t == HTML.Tag.DIV || t == HTML.Tag.P 
+    	        		|| t == HTML.Tag.TR || t == HTML.Tag.TD || t == HTML.Tag.TH) {
+    	            sb.append("\n");
+    	        }
+            }
+
+    	    @Override
+    	    public void handleSimpleTag(final HTML.Tag t, final MutableAttributeSet a, final int pos) {
+    	        handleStartTag(t, a, pos);
+    	    }
+    	};
+    	new ParserDelegator().parse(new StringReader(html), parserCallback, true);
+    	return sb.toString();
+    }
+    
 }
