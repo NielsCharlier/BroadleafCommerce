@@ -26,6 +26,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 public class ThymeleafMessageCreator extends MessageCreator {
@@ -42,7 +43,9 @@ public class ThymeleafMessageCreator extends MessageCreator {
         BroadleafRequestContext blcContext = BroadleafRequestContext.getBroadleafRequestContext();
         
         final Context thymeleafContext = new Context();
-        if (blcContext != null && blcContext.getJavaLocale() != null) {
+        if (props.get("locale") != null) {
+        	thymeleafContext.setLocale((Locale) (props.get("locale")) );
+        } else if (blcContext != null && blcContext.getJavaLocale() != null) {
             thymeleafContext.setLocale(blcContext.getJavaLocale());             
         }           
         

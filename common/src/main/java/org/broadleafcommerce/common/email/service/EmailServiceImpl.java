@@ -20,6 +20,7 @@
 package org.broadleafcommerce.common.email.service;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -95,8 +96,14 @@ public class EmailServiceImpl implements EmailService {
         }
         
         String originalSubject = emailInfo.getSubject();
-        emailInfo.setSubject(messageSource.getMessage(emailInfo.getSubject(), null, emailInfo.getSubject(), 
-        		BroadleafRequestContext.getBroadleafRequestContext().getJavaLocale()));
+        
+        Locale locale;
+        if (props.get("locale") != null) {
+        	locale = (Locale) (props.get("locale"));
+        } else {
+        	locale = BroadleafRequestContext.getBroadleafRequestContext().getJavaLocale();
+        }
+        emailInfo.setSubject(messageSource.getMessage(emailInfo.getSubject(), null, emailInfo.getSubject(), locale));
 
         props.put(EmailPropertyType.INFO.getType(), emailInfo);
         props.put(EmailPropertyType.USER.getType(), emailTarget);

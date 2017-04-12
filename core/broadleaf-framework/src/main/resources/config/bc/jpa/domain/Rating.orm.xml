@@ -64,4 +64,32 @@
         </query>
     </named-query>
     
+    <named-query name="BC_READ_RATING_DETAIL_BY_CUSTOMER_EMAIL_AND_RATING_SUMMARY_ID" >
+        <query>SELECT ratingDetail
+               FROM org.broadleafcommerce.core.rating.domain.RatingDetail ratingDetail
+               WHERE ratingDetail.customer.emailAddress = :customerEmailAddress
+               		AND ratingDetail.ratingSummary.id = :ratingSummaryId
+               ORDER BY ratingDetail.ratingSubmittedDate DESC
+        </query>
+    </named-query>
+    
+    <named-query name="BC_READ_REVIEW_DETAIL_BY_CUSTOMER_EMAIL_AND_RATING_SUMMARY_ID" >
+        <query>SELECT reviewDetail 
+               FROM org.broadleafcommerce.core.rating.domain.ReviewDetail reviewDetail
+               WHERE reviewDetail.customer.emailAddress = :customerEmailAddress
+               		AND reviewDetail.ratingSummary.id = :ratingSummaryId
+               ORDER BY reviewDetail.reivewSubmittedDate DESC
+        </query>
+    </named-query>
+    
+    <named-query name="BC_READ_REVIEW_DETAIL_BY_CUSTOMER_EMAIL_AND_ITEM_ID">
+        <query>
+            SELECT reviewDetail
+            FROM org.broadleafcommerce.core.rating.domain.ReviewDetail reviewDetail
+            WHERE reviewDetail.customer.emailAddress = :customerEmailAddress
+                AND reviewDetail.ratingSummary.itemId = :itemId
+            ORDER BY reviewDetail.reivewSubmittedDate DESC
+        </query>
+    </named-query>
+    
 </entity-mappings>

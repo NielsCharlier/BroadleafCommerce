@@ -82,7 +82,7 @@ public class RatingServiceImpl implements RatingService {
             ratingSummary = ratingSummaryDao.createSummary(itemId, type);
         }
 
-        RatingDetail ratingDetail = ratingSummaryDao.readRating(customer.getId(), ratingSummary.getId());
+        RatingDetail ratingDetail = ratingSummaryDao.readRating(customer, ratingSummary.getId());
 
         if (ratingDetail == null) {
             ratingDetail = ratingSummaryDao.createDetail(ratingSummary, rating, SystemTime.asDate(), customer);
@@ -159,7 +159,7 @@ public class RatingServiceImpl implements RatingService {
             ratingSummary = ratingSummaryDao.createSummary(itemId, type);
         }
 
-        RatingDetail ratingDetail = ratingSummaryDao.readRating(customer.getId(), ratingSummary.getId());
+        RatingDetail ratingDetail = ratingSummaryDao.readRating(customer, ratingSummary.getId());
 
         if (ratingDetail == null) {
             ratingDetail = ratingSummaryDao.createDetail(ratingSummary, rating, SystemTime.asDate(), customer);
@@ -169,7 +169,7 @@ public class RatingServiceImpl implements RatingService {
 
         ratingSummary.getRatings().add(ratingDetail);
 
-        ReviewDetail reviewDetail = ratingSummaryDao.readReview(customer.getId(), ratingSummary.getId());
+        ReviewDetail reviewDetail = ratingSummaryDao.readReview(customer, ratingSummary.getId());
 
         if (reviewDetail == null) {
             reviewDetail = new ReviewDetailImpl(customer, SystemTime.asDate(), ratingDetail, reviewText, ratingSummary);

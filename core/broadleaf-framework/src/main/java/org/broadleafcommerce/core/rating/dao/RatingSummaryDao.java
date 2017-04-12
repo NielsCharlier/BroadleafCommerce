@@ -43,6 +43,6 @@ public interface RatingSummaryDao {
     RatingSummary saveRatingSummary(RatingSummary summary);
     void deleteRatingSummary(RatingSummary summary);
 
-    RatingDetail readRating(Long customerId, Long ratingSummaryId);
-    ReviewDetail readReview(Long customerId, Long ratingSummaryId);
+    RatingDetail readRating(Customer customer, Long ratingSummaryId);
+    ReviewDetail readReview(Customer customer, Long ratingSummaryId);
 }

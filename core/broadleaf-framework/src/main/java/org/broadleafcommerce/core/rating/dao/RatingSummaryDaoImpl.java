@@ -121,9 +121,9 @@ public class RatingSummaryDaoImpl extends BatchRetrieveDao implements RatingSumm
     }
 
     @Override
-    public RatingDetail readRating(final Long customerId, final Long ratingSummaryId) {
+    public RatingDetail readRating(final Customer customer, final Long ratingSummaryId) {
         final Query query = em.createNamedQuery("BC_READ_RATING_DETAIL_BY_CUSTOMER_ID_AND_RATING_SUMMARY_ID");
-        query.setParameter("customerId", customerId);
+        query.setParameter("customerId", customer.getId());
         query.setParameter("ratingSummaryId", ratingSummaryId);
         query.setHint(QueryHints.HINT_CACHEABLE, true);
         query.setHint(QueryHints.HINT_CACHE_REGION, "query.Catalog");
@@ -132,16 +132,23 @@ public class RatingSummaryDaoImpl extends BatchRetrieveDao implements RatingSumm
         try {
             ratingDetail = (RatingDetail) query.getSingleResult();
         } catch (NoResultException e) {
-            // ignore
+        	final Query query2 = em.createNamedQuery("BC_READ_RATING_DETAIL_BY_CUSTOMER_EMAIL_AND_RATING_SUMMARY_ID");
+        	query2.setParameter("customerEmailAddress", customer.getEmailAddress());
+        	query2.setParameter("ratingSummaryId", ratingSummaryId);
+        	@SuppressWarnings("unchecked")
+			List<RatingDetail> list = query2.getResultList();
+        	if (list.size() > 0) {
+        		ratingDetail = list.get(0);
+        	}
         }
 
         return ratingDetail;
     }
 
     @Override
-    public ReviewDetail readReview(final Long customerId, final Long ratingSummaryId) {
+    public ReviewDetail readReview(final Customer customer, final Long ratingSummaryId) {
         final Query query = em.createNamedQuery("BC_READ_REVIEW_DETAIL_BY_CUSTOMER_ID_AND_RATING_SUMMARY_ID");
-        query.setParameter("customerId", customerId);
+        query.setParameter("customerId", customer.getId());
         query.setParameter("ratingSummaryId", ratingSummaryId);
         query.setHint(QueryHints.HINT_CACHEABLE, true);
         query.setHint(QueryHints.HINT_CACHE_REGION, "query.Catalog");
@@ -150,7 +157,14 @@ public class RatingSummaryDaoImpl extends BatchRetrieveDao implements RatingSumm
         try {
             reviewDetail = (ReviewDetail) query.getSingleResult();
         } catch (NoResultException e) {
-            // ignore
+        	final Query query2 = em.createNamedQuery("BC_READ_REVIEW_DETAIL_BY_CUSTOMER_EMAIL_AND_RATING_SUMMARY_ID");
+        	query2.setParameter("customerEmailAddress", customer.getEmailAddress());
+        	query2.setParameter("ratingSummaryId", ratingSummaryId);
+        	@SuppressWarnings("unchecked")
+			List<ReviewDetail> list = query2.getResultList();
+        	if (list.size() > 0) {
+        		reviewDetail = list.get(0);
+        	}
         }
 
         return reviewDetail;

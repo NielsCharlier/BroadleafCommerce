@@ -26,6 +26,8 @@ import org.broadleafcommerce.core.rating.domain.ReviewFeedback;
 import org.broadleafcommerce.profile.core.domain.Customer;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -58,8 +60,15 @@ public class ReviewDetailDaoImpl implements ReviewDetailDao {
         try {
             reviewDetail = (ReviewDetail) query.getSingleResult();
         } catch (NoResultException nre) {
-            //ignore
-        }
+        	final Query query2 = em.createNamedQuery("BC_READ_REVIEW_DETAIL_BY_CUSTOMER_EMAIL_AND_ITEM_ID");
+        	query2.setParameter("customerEmailAddress", customer.getEmailAddress());
+        	query2.setParameter("itemId", itemId);
+        	@SuppressWarnings("unchecked")
+			List<ReviewDetail> list = query2.getResultList();
+        	if (list.size() > 0) {
+        		reviewDetail = list.get(0);
+        	}
+        }        
         return reviewDetail;
     }
 
