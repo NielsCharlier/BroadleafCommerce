@@ -69,7 +69,7 @@ public class ReviewDetailImpl implements ReviewDetail {
     @Column(name = "REVIEW_SUBMITTED_DATE", nullable = false)
     protected Date reivewSubmittedDate;
 
-    @Column(name = "REVIEW_TEXT", nullable = false)
+    @Column(name = "REVIEW_TEXT", nullable = false, length = Integer.MAX_VALUE)
     protected String reviewText;
 
     @Column(name = "REVIEW_STATUS", nullable = false)
