@@ -38,5 +38,7 @@ public interface ReviewDetail {
     RatingSummary getRatingSummary();
     RatingDetail getRatingDetail();
     List<ReviewFeedback> getReviewFeedback();
+	String getReviewAnswer();
+	void setReviewAnswer(String reviewAnswer);
 
 }

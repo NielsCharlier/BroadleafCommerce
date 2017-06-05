@@ -71,6 +71,9 @@ public class ReviewDetailImpl implements ReviewDetail {
 
     @Column(name = "REVIEW_TEXT", nullable = false, length = Integer.MAX_VALUE)
     protected String reviewText;
+    
+    @Column(name = "REVIEW_ANSWER", length = Integer.MAX_VALUE)
+    protected String reviewAnswer;
 
     @Column(name = "REVIEW_STATUS", nullable = false)
     @Index(name="REVIEWDETAIL_STATUS_INDEX", columnNames={"REVIEW_STATUS"})
@@ -129,8 +132,18 @@ public class ReviewDetailImpl implements ReviewDetail {
     public void setReviewText(String reviewText) {
         this.reviewText = reviewText;
     }
+    
+    @Override
+    public String getReviewAnswer() {
+		return reviewAnswer;
+	}
 
     @Override
+	public void setReviewAnswer(String reviewAnswer) {
+		this.reviewAnswer = reviewAnswer;
+	}
+
+	@Override
     public ReviewStatusType getStatus() {
         return new ReviewStatusType(reviewStatus);
     }
