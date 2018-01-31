@@ -113,5 +113,7 @@ public interface ProductOptionValue extends Serializable, MultiTenantCloneable<P
     public void setProductOption(ProductOption productOption);
     
     public String getAttributeInfo();
+
+	String getRawAttributeValue();
     
 }
