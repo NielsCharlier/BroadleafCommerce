@@ -83,7 +83,11 @@ public class CustomerCustomPersistenceHandler extends CustomPersistenceHandlerAd
             adminInstance = (Customer) helper.createPopulatedInstance(adminInstance, entity, adminProperties, false);
 
             if (useEmailForLogin) {
-                adminInstance.setUsername(adminInstance.getEmailAddress());
+            	if (adminInstance.isRegistered()) {
+            		adminInstance.setUsername(adminInstance.getEmailAddress());
+            	} else {
+            		adminInstance.setUsername(adminInstance.getId().toString());
+            	}
             }
             
             Entity errorEntity = validateUniqueUsername(entity, adminInstance);
