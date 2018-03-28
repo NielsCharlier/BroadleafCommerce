@@ -558,6 +558,11 @@ public class AdminBasicEntityController extends AdminAbstractController {
 		// hook
 		
 	}
+    
+    protected void onSuccesfulSaveItem(String id, String field) {
+		// hook
+		
+	}
 
 	/**
      * Attempts to remove the given entity.
@@ -1337,6 +1342,8 @@ public class AdminBasicEntityController extends AdminAbstractController {
             return showViewUpdateCollection(request, model, pathVars, id, collectionField, collectionItemId, alternateId,
                     "updateCollectionItem", entityForm, savedEntity); 
         }
+        
+        onSuccesfulSaveItem(collectionItemId, collectionField);
         
         // Next, we must get the new list grid that represents this collection
         ListGrid listGrid = getCollectionListGrid(mainMetadata, entity, collectionProperty, null, sectionKey, persistenceResponse, sectionCrumbs);
